@@ -1,7 +1,9 @@
 import type { CollectionConfig } from 'payload'
 
 import { authenticatedOrPublished } from '../../access/authenticatedOrPublished'
-import { adminOrEditor, anyCreator, ownOrEditor } from '../../access/byRole'
+import { adminOrEditor, anyCreator } from '../../access/byRole'
+import { approvalStatusField, workflowAuditFields } from '../../workflow/field'
+import { validateTransition } from '../../workflow/hooks/validateTransition'
 import { Archive } from '../../blocks/ArchiveBlock/config'
 import { CallToAction } from '../../blocks/CallToAction/config'
 import { Content } from '../../blocks/Content/config'
@@ -27,7 +29,8 @@ export const Pages: CollectionConfig<'pages'> = {
     create: anyCreator,
     delete: adminOrEditor,
     read: authenticatedOrPublished,
-    update: ownOrEditor,
+    // Pages are structural site content — editors manage them, authors use Posts
+    update: adminOrEditor,
   },
   // This config controls what's populated by default when a page is referenced
   // https://payloadcms.com/docs/queries/select#defaultpopulate-collection-config-property
@@ -55,6 +58,7 @@ export const Pages: CollectionConfig<'pages'> = {
     useAsTitle: 'title',
   },
   fields: [
+    approvalStatusField(),
     {
       name: 'title',
       type: 'text',
@@ -118,10 +122,11 @@ export const Pages: CollectionConfig<'pages'> = {
       },
     },
     slugField(),
+    ...workflowAuditFields(),
   ],
   hooks: {
+    beforeChange: [validateTransition, populatePublishedAt],
     afterChange: [revalidatePage],
-    beforeChange: [populatePublishedAt],
     afterDelete: [revalidateDelete],
   },
   versions: {

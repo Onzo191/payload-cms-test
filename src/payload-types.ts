@@ -157,6 +157,7 @@ export interface UserAuthOperations {
  */
 export interface Page {
   id: string;
+  approvalStatus?: ('draft' | 'pending_review' | 'changes_requested' | 'approved' | 'published' | 'archived') | null;
   title: string;
   hero: {
     type: 'none' | 'highImpact' | 'mediumImpact' | 'lowImpact';
@@ -216,6 +217,19 @@ export interface Page {
    */
   generateSlug?: boolean | null;
   slug: string;
+  /**
+   * Reviewer notes visible to the author after review.
+   */
+  reviewNote?: string | null;
+  /**
+   * Who submitted this for review.
+   */
+  submittedBy?: (string | null) | User;
+  /**
+   * Who last reviewed this content.
+   */
+  reviewedBy?: (string | null) | User;
+  reviewedAt?: string | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -226,6 +240,7 @@ export interface Page {
  */
 export interface Post {
   id: string;
+  approvalStatus?: ('draft' | 'pending_review' | 'changes_requested' | 'approved' | 'published' | 'archived') | null;
   title: string;
   heroImage?: (string | null) | Media;
   content: {
@@ -266,6 +281,19 @@ export interface Post {
    */
   generateSlug?: boolean | null;
   slug: string;
+  /**
+   * Reviewer notes visible to the author after review.
+   */
+  reviewNote?: string | null;
+  /**
+   * Who submitted this for review.
+   */
+  submittedBy?: (string | null) | User;
+  /**
+   * Who last reviewed this content.
+   */
+  reviewedBy?: (string | null) | User;
+  reviewedAt?: string | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -1062,6 +1090,7 @@ export interface PayloadMigration {
  * via the `definition` "pages_select".
  */
 export interface PagesSelect<T extends boolean = true> {
+  approvalStatus?: T;
   title?: T;
   hero?:
     | T
@@ -1104,6 +1133,10 @@ export interface PagesSelect<T extends boolean = true> {
   publishedAt?: T;
   generateSlug?: T;
   slug?: T;
+  reviewNote?: T;
+  submittedBy?: T;
+  reviewedBy?: T;
+  reviewedAt?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -1197,6 +1230,7 @@ export interface FormBlockSelect<T extends boolean = true> {
  * via the `definition` "posts_select".
  */
 export interface PostsSelect<T extends boolean = true> {
+  approvalStatus?: T;
   title?: T;
   heroImage?: T;
   content?: T;
@@ -1219,6 +1253,10 @@ export interface PostsSelect<T extends boolean = true> {
       };
   generateSlug?: T;
   slug?: T;
+  reviewNote?: T;
+  submittedBy?: T;
+  reviewedBy?: T;
+  reviewedAt?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;

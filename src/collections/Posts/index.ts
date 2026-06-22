@@ -11,6 +11,8 @@ import {
 
 import { authenticatedOrPublished } from '../../access/authenticatedOrPublished'
 import { adminOrEditor, anyCreator, ownOrEditor } from '../../access/byRole'
+import { approvalStatusField, workflowAuditFields } from '../../workflow/field'
+import { validateTransition } from '../../workflow/hooks/validateTransition'
 import { Banner } from '../../blocks/Banner/config'
 import { Code } from '../../blocks/Code/config'
 import { MediaBlock } from '../../blocks/MediaBlock/config'
@@ -66,6 +68,7 @@ export const Posts: CollectionConfig<'posts'> = {
     useAsTitle: 'title',
   },
   fields: [
+    approvalStatusField(),
     {
       name: 'title',
       type: 'text',
@@ -215,8 +218,10 @@ export const Posts: CollectionConfig<'posts'> = {
       ],
     },
     slugField(),
+    ...workflowAuditFields(),
   ],
   hooks: {
+    beforeChange: [validateTransition],
     afterChange: [revalidatePost],
     afterRead: [populateAuthors],
     afterDelete: [revalidateDelete],

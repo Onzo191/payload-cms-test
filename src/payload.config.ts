@@ -62,6 +62,9 @@ export default buildConfig({
       connectionString: process.env.DATABASE_URL || '',
     },
     idType: 'uuid',
+    // Dev: Payload auto-pushes schema changes on startup — no need to run `pnpm payload migrate`.
+    // Prod: push is disabled; run `pnpm payload migrate` before each deployment.
+    push: process.env.NODE_ENV !== 'production',
   }),
   collections: [Pages, Posts, Media, Categories, Users],
   cors: [getServerSideURL()].filter(Boolean),
