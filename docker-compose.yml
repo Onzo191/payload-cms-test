@@ -1,31 +1,33 @@
-version: '3'
-
 services:
   payload:
-    image: node:18-alpine
+    image: node:22-alpine
     ports:
       - '3000:3000'
     volumes:
       - .:/home/node/app
       - node_modules:/home/node/app/node_modules
     working_dir: /home/node/app/
-    command: sh -c "yarn install && yarn dev"
+    command: sh -c "corepack enable && corepack prepare pnpm@10.34.3 --activate && pnpm install && pnpm dev"
     depends_on:
-      - mongo
+      - db
     env_file:
       - .env
+    environment:
+      - DATABASE_URL=postgres://postgres:Tuan1901@db:5432/payload-cmd-test
 
-  mongo:
-    image: mongo:latest
+  db:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Tuan1901
+      POSTGRES_DB: payload-cmd-test
     ports:
-      - '27017:27017'
-    command:
-      - --storageEngine=wiredTiger
+      - '5433:5432'
     volumes:
-      - data:/data/db
-    logging:
-      driver: none
+      - pgdata:/var/lib/postgresql/data
 
 volumes:
-  data:
+  pgdata:
   node_modules:
+

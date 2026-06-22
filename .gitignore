@@ -7,6 +7,8 @@ node_modules
 next-env.d.ts
 .vercel
 
+.npmp-store/
+
 # Payload default media upload directory
 public/media/
 
