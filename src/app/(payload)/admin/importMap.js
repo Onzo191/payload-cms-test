@@ -1,5 +1,5 @@
-import { ApprovalStatusCell as ApprovalStatusCell_04833eee6482806b771c56c8a8787228 } from '@/workflow/components/ApprovalStatusCell'
-import { ApprovalStatusField as ApprovalStatusField_6dfd634e91f8e6165451d24835ba4478 } from '@/workflow/components/ApprovalStatusField'
+import { ApprovalStatusCell as ApprovalStatusCell_64a7f3443e3bb18060b46ede765c3a25 } from '@/features/workflow/components/ApprovalStatusCell'
+import { ApprovalStatusField as ApprovalStatusField_e038a24c151ab1938b8bbee573504812 } from '@/features/workflow/components/ApprovalStatusField'
 import { RscEntryLexicalCell as RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { RscEntryLexicalField as RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { LexicalDiffComponent as LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
@@ -24,17 +24,17 @@ import { FolderField as FolderField_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@pa
 import { LinkToDoc as LinkToDoc_aead06e4cbf6b2620c5c51c9ab283634 } from '@payloadcms/plugin-search/client'
 import { ReindexButton as ReindexButton_aead06e4cbf6b2620c5c51c9ab283634 } from '@payloadcms/plugin-search/client'
 import { FolderTypeField as FolderTypeField_2b8867833a34864a02ddf429b0728a40 } from '@payloadcms/next/client'
-import { RowLabel as RowLabel_ec255a65fa6fa8d1faeb09cf35284224 } from '@/Header/RowLabel'
-import { RowLabel as RowLabel_1f6ff6ff633e3695d348f4f3c58f1466 } from '@/Footer/RowLabel'
-import { default as default_c20543071af68494fb006682b0abe86f } from '@/components/WorkflowWidget'
-import { default as default_1a7510af427896d367a49dbf838d2de6 } from '@/components/BeforeDashboard'
-import { default as default_8a7ab0eb7ab5c511aba12e68480bfe5e } from '@/components/BeforeLogin'
+import { RowLabel as RowLabel_f69416c76d943df3c80c0df05dd8a871 } from '@/site/Header/RowLabel'
+import { RowLabel as RowLabel_d70ef502e4fda5335d14577d3082e07a } from '@/site/Footer/RowLabel'
+import { default as default_6cb5cfc1730ad27f740a993e97f97548 } from '@/features/workflow/Widget'
+import { default as default_ec4faf0207c87847ad4fc887f53d906a } from '@/shared/components/BeforeDashboard'
+import { default as default_0dee3767f18303ef22d2a9ed88053da7 } from '@/shared/components/BeforeLogin'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
 /** @type import('payload').ImportMap */
 export const importMap = {
-  "@/workflow/components/ApprovalStatusCell#ApprovalStatusCell": ApprovalStatusCell_04833eee6482806b771c56c8a8787228,
-  "@/workflow/components/ApprovalStatusField#ApprovalStatusField": ApprovalStatusField_6dfd634e91f8e6165451d24835ba4478,
+  "@/features/workflow/components/ApprovalStatusCell#ApprovalStatusCell": ApprovalStatusCell_64a7f3443e3bb18060b46ede765c3a25,
+  "@/features/workflow/components/ApprovalStatusField#ApprovalStatusField": ApprovalStatusField_e038a24c151ab1938b8bbee573504812,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalCell": RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalField": RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#LexicalDiffComponent": LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e,
@@ -59,10 +59,10 @@ export const importMap = {
   "@payloadcms/plugin-search/client#LinkToDoc": LinkToDoc_aead06e4cbf6b2620c5c51c9ab283634,
   "@payloadcms/plugin-search/client#ReindexButton": ReindexButton_aead06e4cbf6b2620c5c51c9ab283634,
   "@payloadcms/next/client#FolderTypeField": FolderTypeField_2b8867833a34864a02ddf429b0728a40,
-  "@/Header/RowLabel#RowLabel": RowLabel_ec255a65fa6fa8d1faeb09cf35284224,
-  "@/Footer/RowLabel#RowLabel": RowLabel_1f6ff6ff633e3695d348f4f3c58f1466,
-  "@/components/WorkflowWidget#default": default_c20543071af68494fb006682b0abe86f,
-  "@/components/BeforeDashboard#default": default_1a7510af427896d367a49dbf838d2de6,
-  "@/components/BeforeLogin#default": default_8a7ab0eb7ab5c511aba12e68480bfe5e,
+  "@/site/Header/RowLabel#RowLabel": RowLabel_f69416c76d943df3c80c0df05dd8a871,
+  "@/site/Footer/RowLabel#RowLabel": RowLabel_d70ef502e4fda5335d14577d3082e07a,
+  "@/features/workflow/Widget#default": default_6cb5cfc1730ad27f740a993e97f97548,
+  "@/shared/components/BeforeDashboard#default": default_ec4faf0207c87847ad4fc887f53d906a,
+  "@/shared/components/BeforeLogin#default": default_0dee3767f18303ef22d2a9ed88053da7,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }
