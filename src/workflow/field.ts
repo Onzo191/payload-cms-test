@@ -19,6 +19,7 @@ export function approvalStatusField(): Field {
       position: 'sidebar',
       components: {
         Field: '@/workflow/components/ApprovalStatusField#ApprovalStatusField',
+          Cell: '@/workflow/components/ApprovalStatusCell#ApprovalStatusCell',
       },
     },
   }
