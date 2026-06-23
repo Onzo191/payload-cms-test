@@ -49,6 +49,12 @@ export const Posts: CollectionConfig<'posts'> = {
   },
   admin: {
     defaultColumns: ['title', 'approvalStatus', 'updatedAt'],
+    components: {
+      edit: {
+        // Publishing is driven from the approval workflow stepper in the sidebar.
+        PublishButton: '@/features/workflow/components/HidePublishButton#HidePublishButton',
+      },
+    },
     livePreview: {
       url: ({ data, req }) =>
         generatePreviewPath({

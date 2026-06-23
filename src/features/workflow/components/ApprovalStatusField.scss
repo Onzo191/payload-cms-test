@@ -157,6 +157,26 @@
       border-color: color-mix(in srgb, var(--wf-changes-dot) 45%, transparent);
       &:hover { background: var(--wf-changes-bg); filter: brightness(0.97); }
     }
+
+    // The terminal "go live" action — the strongest affordance in the control.
+    &--publish {
+      background: var(--theme-success-600);
+      color: #fff;
+      box-shadow: 0 1px 2px color-mix(in srgb, var(--theme-success-700) 35%, transparent);
+      &:hover { background: var(--theme-success-700); }
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: progress;
+    }
+  }
+
+  // Separates the approval-pipeline moves from the publish action.
+  &__divider {
+    height: 1px;
+    background: var(--theme-elevation-150);
+    margin: calc(var(--base) * 0.2) 0;
   }
 
   &__hint {

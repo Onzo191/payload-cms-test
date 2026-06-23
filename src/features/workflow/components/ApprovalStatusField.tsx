@@ -1,6 +1,7 @@
 'use client'
-import React from 'react'
-import { useField, useAuth } from '@payloadcms/ui'
+import React, { useCallback, useState } from 'react'
+import { useField, useAuth, useForm, useConfig, useDocumentInfo } from '@payloadcms/ui'
+import { formatAdminURL } from 'payload/shared'
 
 import { TRANSITIONS, WF, type WorkflowStatus } from '@/features/workflow/types'
 import type { Role } from '@/features/rbac/roles'
@@ -29,12 +30,18 @@ export const ApprovalStatusField: React.FC<{
 }> = ({ path = 'approvalStatus', readOnly }) => {
   const { value, setValue } = useField<WorkflowStatus>({ path })
   const { user } = useAuth()
+  const { submit } = useForm()
+  const { config } = useConfig()
+  const { id, collectionSlug } = useDocumentInfo()
+  const [busy, setBusy] = useState(false)
 
   const current = (value ?? WF.DRAFT) as WorkflowStatus
   const currentIndex = pipelineIndex(current)
   const isChanges = current === WF.CHANGES_REQUESTED
+  const isPublished = current === WF.PUBLISHED
 
   const userRoles = ((user as Record<string, unknown>)?.roles ?? []) as Role[]
+  const canPublish = userRoles.some((r) => r === 'super-admin' || r === 'admin' || r === 'editor')
 
   const validTransitions = readOnly
     ? []
@@ -42,6 +49,34 @@ export const ApprovalStatusField: React.FC<{
         ([from, , allowedRoles]) =>
           from === current && allowedRoles.some((r) => userRoles.includes(r)),
       )
+
+  // Drive Payload's native publish state from the sidebar so the whole workflow
+  // lives in one place. This mirrors the default PublishButton: a real (non-draft)
+  // save with a `_status` override — the only reliable way to flip publish state.
+  const setStatus = useCallback(
+    async (status: 'published' | 'draft') => {
+      if (busy) return
+      const api = config.routes.api
+      const params = status === 'draft' ? '?depth=0&draft=true' : '?depth=0'
+      const action = formatAdminURL({
+        apiRoute: api,
+        path: `/${collectionSlug}${id ? `/${id}` : ''}${params}`,
+      })
+      setBusy(true)
+      try {
+        await submit({
+          action,
+          method: id ? 'PATCH' : 'POST',
+          overrides: { _status: status },
+          // Unpublishing shouldn't be blocked by required-field validation.
+          skipValidation: status === 'draft',
+        })
+      } finally {
+        setBusy(false)
+      }
+    },
+    [busy, config.routes.api, collectionSlug, id, submit],
+  )
 
   return (
     <div className="approval">
@@ -79,25 +114,68 @@ export const ApprovalStatusField: React.FC<{
         })}
       </div>
 
-      {validTransitions.length > 0 && (
-        <div className="approval__actions">
-          {validTransitions.map(([, to]) => (
-            <button
-              key={to}
-              type="button"
-              className={`approval__btn approval__btn--${variantFor(to)}`}
-              onClick={() => setValue(to)}
-            >
-              {TRANSITION_LABEL[`${current}→${to}`] ?? STATUS_LABEL[to]}
-            </button>
-          ))}
+      <div className="approval__actions">
+        {/* Approval-pipeline moves (applied on the next save). */}
+        {validTransitions.map(([, to]) => (
+          <button
+            key={to}
+            type="button"
+            disabled={busy}
+            className={`approval__btn approval__btn--${variantFor(to)}`}
+            onClick={() => setValue(to)}
+          >
+            {TRANSITION_LABEL[`${current}→${to}`] ?? STATUS_LABEL[to]}
+          </button>
+        ))}
+        {validTransitions.length > 0 && (
           <p className="approval__hint">Choose an action, then Save to apply it.</p>
-        </div>
-      )}
+        )}
 
-      {validTransitions.length === 0 && !readOnly && (
-        <p className="approval__hint">No actions available to your role at this stage.</p>
-      )}
+        {/* Publish / Unpublish — go live without leaving the workflow. */}
+        {canPublish && !readOnly && (
+          <>
+            {(validTransitions.length > 0 || isPublished) && (
+              <span className="approval__divider" />
+            )}
+
+            {!isPublished && (
+              <>
+                <button
+                  type="button"
+                  disabled={busy}
+                  className="approval__btn approval__btn--publish"
+                  onClick={() => void setStatus('published')}
+                >
+                  {busy ? 'Publishing…' : '🚀 Publish now'}
+                </button>
+                {current !== WF.APPROVED && (
+                  <p className="approval__hint">
+                    Skips the remaining review steps — use when it’s urgent.
+                  </p>
+                )}
+              </>
+            )}
+
+            {isPublished && (
+              <>
+                <button
+                  type="button"
+                  disabled={busy}
+                  className="approval__btn approval__btn--secondary"
+                  onClick={() => void setStatus('draft')}
+                >
+                  {busy ? 'Unpublishing…' : 'Unpublish'}
+                </button>
+                <p className="approval__hint">Live on the site. Unpublishing returns it to draft.</p>
+              </>
+            )}
+          </>
+        )}
+
+        {validTransitions.length === 0 && !canPublish && !readOnly && !isPublished && (
+          <p className="approval__hint">No actions available to your role at this stage.</p>
+        )}
+      </div>
     </div>
   )
 }

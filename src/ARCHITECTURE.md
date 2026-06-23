@@ -67,12 +67,19 @@ src/
 
 ## Workflow model (`features/workflow/`)
 
-- **States** (`types.ts` → `WF`): `draft → pending_review → {approved | changes_requested}
-  → published → archived`. Legal moves + which roles may make them live in `TRANSITIONS`.
+- **States** (`types.ts` → `WF`): `draft → pending_review → {approved | changes_requested}`
+  is the *approval pipeline*, driven by the sidebar stepper via ordinary (draft) saves;
+  `TRANSITIONS` lists those legal moves and which roles may make them.
+- **Publish is owned by Payload, gated by the workflow.** `published` / `archived` are **not**
+  reached through stepper transitions — going live rides on Payload's native **Publish** /
+  **Unpublish** buttons (the only reliable way to flip `_status`, which is what the public site
+  and `authenticatedOrPublished` actually read). `validateTransition` is the gate: only
+  editors+ may publish (they may publish urgently straight from any stage), and it keeps
+  `approvalStatus` in lockstep with `_status` (publish → `published`, unpublish → `draft`).
 - **Fields** (`field.ts`): `approvalStatusField()` + `workflowAuditFields()`
   (`reviewNote`, `submittedBy`, `reviewedBy`, `reviewedAt`). Add to a collection's `fields`.
 - **Enforcement** (`hooks/validateTransition.ts`): a `beforeChange` hook that rejects illegal
-  transitions, blocks non-publishers from publishing, and stamps audit fields.
+  pipeline transitions, enforces the publish gate above, and stamps audit fields.
 - **Widget** (`Widget/`): admin dashboard badge counting items pending review / changes.
 
 ## Recipes
