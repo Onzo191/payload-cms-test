@@ -51,7 +51,12 @@ export const hero: Field = {
           ]
         },
       }),
-      label: false,
+      label: 'Rich Text',
+      admin: {
+        components: {
+          Label: '@/shared/components/NullLabel',
+        },
+      },
     },
     linkGroup({
       overrides: {

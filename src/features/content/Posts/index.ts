@@ -103,9 +103,15 @@ export const Posts: CollectionConfig<'posts'> = {
                   ]
                 },
               }),
-              label: false,
+              label: 'Content',
+              admin: {
+                components: {
+                  Label: '@/shared/components/NullLabel',
+                },
+              },
               required: true,
             },
+
           ],
           label: 'Content',
         },
