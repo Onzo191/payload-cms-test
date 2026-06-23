@@ -1,0 +1,116 @@
+@use 'sass:color';
+
+// =============================================================================
+// Admin theme — "Warm neutral", VNG orange accent
+// -----------------------------------------------------------------------------
+// HOW TO RECOLOUR THE WHOLE ADMIN:
+//   • Brand accent  → change `$brand` below. The entire accent ramp (links,
+//     focus rings, active nav, primary buttons, workflow stepper) is generated
+//     from it via Sass colour math, in BOTH light and dark.
+//   • Neutrals      → edit the `--color-base-*` warm-gray ramp.
+//   • Status colours→ edit the `$wf-status` map; every pill/badge/stepper reads
+//     from the `--wf-*` CSS variables it produces.
+//   • Roundness     → `--style-radius-*`.
+//
+// Everything in Payload derives from `--color-base-*` (neutrals) and
+// `--theme-success-*` (its accent ramp), so re-tinting those two recolours the
+// whole panel. Rules here are intentionally unlayered, so they beat Payload's
+// `@layer payload-default`.
+// =============================================================================
+
+// ---- BRAND KNOBS -----------------------------------------------------------
+$brand: #ef6c1f; // VNG orange — change this one value to rebrand the admin
+$brand-tint: #fff9f4; // warm white the light steps mix toward
+$brand-shade: #2a1c12; // warm near-black the dark steps mix toward
+
+// Accent ramp stops, expressed as "% of brand" mixed with tint (light) / shade (dark).
+$accent-tints: (50: 7%, 100: 15%, 150: 25%, 200: 35%, 250: 47%, 300: 60%, 350: 73%, 400: 86%, 450: 95%);
+$accent-shades: (550: 88%, 600: 76%, 650: 64%, 700: 53%, 750: 43%, 800: 35%, 850: 27%, 900: 19%, 950: 12%);
+
+// Workflow status palette — one source of truth: (background, text, dot).
+$wf-status: (
+  draft: (#edebe6, #6b6a63, #a8a498),
+  pending: (#f6ebd6, #8a6a2c, #d8a24e),
+  changes: (#f3e0da, #9a5444, #c9745e),
+  approved: (#dee9e2, #43645a, #5b7b6f),
+  published: (#2b3a33, #e7efe9, #9ab3a6),
+  archived: (#e8e6e1, #8a877f, #b7b3a9),
+);
+
+:root {
+  // --- Warm gray ramp (light → dark). Drives bg, text, borders, nav, inputs. ---
+  --color-base-0: #fafaf8; // app background + "white" surfaces
+  --color-base-50: #f3f1ec;
+  --color-base-100: #ebe8e1;
+  --color-base-150: #e1ddd4; // default border colour
+  --color-base-200: #d5d1c7;
+  --color-base-250: #c8c4ba;
+  --color-base-300: #bbb7ad;
+  --color-base-350: #ada99f;
+  --color-base-400: #9f9b91;
+  --color-base-450: #908c82;
+  --color-base-500: #817d74;
+  --color-base-550: #736f66;
+  --color-base-600: #656158;
+  --color-base-650: #57534b;
+  --color-base-700: #49463e;
+  --color-base-750: #3a3832;
+  --color-base-800: #2b2b28; // body text (light): --theme-text = elevation-800
+  --color-base-850: #232220;
+  --color-base-900: #1b1a17; // app background (dark)
+  --color-base-950: #131210;
+  --color-base-1000: #0b0b0a;
+
+  // --- Accent ramp, generated from $brand. Payload uses "success" as its accent. ---
+  --color-success-500: #{$brand};
+  @each $k, $w in $accent-tints {
+    --color-success-#{$k}: #{color.mix($brand, $brand-tint, $w)};
+  }
+  @each $k, $w in $accent-shades {
+    --color-success-#{$k}: #{color.mix($brand, $brand-shade, $w)};
+  }
+  // A plain handle for the brand, for components that want it directly.
+  --brand: #{$brand};
+
+  // --- Workflow status variables, generated from $wf-status. ---
+  @each $name, $c in $wf-status {
+    --wf-#{$name}-bg: #{nth($c, 1)};
+    --wf-#{$name}-tx: #{nth($c, 2)};
+    --wf-#{$name}-dot: #{nth($c, 3)};
+  }
+
+  // --- Softer corners (Payload defaults are 3 / 4 / 8). ---
+  --style-radius-s: 6px;
+  --style-radius-m: 10px;
+  --style-radius-l: 14px;
+}
+
+// -----------------------------------------------------------------------------
+// Gentle refinements the variable ramp can't express on its own.
+// Kept minimal and defensive so they don't fight Payload's cascade.
+// -----------------------------------------------------------------------------
+
+// Calmer focus ring (soft brand halo instead of the hard default outline).
+.field-type input:focus,
+.field-type textarea:focus,
+.field-type .rs__control--is-focused,
+input:focus-visible,
+button:focus-visible {
+  box-shadow: 0 0 0 3px var(--color-success-100) !important;
+  border-color: var(--color-success-500) !important;
+  outline: none !important;
+}
+
+// Softer, warmer elevation for floating surfaces (popups, dropdowns, tooltips).
+.popup__content,
+.rs__menu,
+.tooltip {
+  box-shadow:
+    0 1px 2px rgba(43, 43, 40, 0.05),
+    0 10px 30px -14px rgba(43, 43, 40, 0.22) !important;
+}
+
+// Let the sidebar breathe a touch more than the dense default.
+.nav .nav__link {
+  border-radius: var(--style-radius-s);
+}

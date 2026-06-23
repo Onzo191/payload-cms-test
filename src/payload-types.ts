@@ -449,7 +449,7 @@ export interface User {
   id: string;
   name?: string | null;
   /**
-   * Roles control what this user can do in the admin panel.
+   * What this person can do. Super Admin / Admin: manage people and all content. Editor: review and publish. Author: write and submit their own posts. Reviewer: approve or send back — no publishing. Viewer: read only.
    */
   roles: ('super-admin' | 'admin' | 'editor' | 'author' | 'reviewer' | 'viewer')[];
   updatedAt: string;

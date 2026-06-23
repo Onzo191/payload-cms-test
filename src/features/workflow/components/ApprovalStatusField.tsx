@@ -1,101 +1,102 @@
 'use client'
 import React from 'react'
-import { useField, useAuth, Button, Pill } from '@payloadcms/ui'
+import { useField, useAuth } from '@payloadcms/ui'
 
 import { TRANSITIONS, WF, type WorkflowStatus } from '@/features/workflow/types'
 import type { Role } from '@/features/rbac/roles'
+import {
+  PIPELINE,
+  STAGE_SUB,
+  STATUS_LABEL,
+  STATUS_PILL_CLASS,
+  TRANSITION_LABEL,
+  pipelineIndex,
+} from './statusMeta'
+import './ApprovalStatusField.scss'
 
-type PillStyleType = 'always-white' | 'dark' | 'error' | 'light' | 'light-gray' | 'success' | 'warning' | 'white'
-type ButtonStyleType = 'dashed' | 'error' | 'none' | 'pill' | 'primary' | 'secondary' | 'subtle' | 'transparent'
+type ButtonVariant = 'primary' | 'secondary' | 'danger'
 
-const STATUS_PILL: Record<WorkflowStatus, PillStyleType> = {
-  [WF.DRAFT]:             'light-gray',
-  [WF.PENDING_REVIEW]:    'warning',
-  [WF.CHANGES_REQUESTED]: 'error',
-  [WF.APPROVED]:          'success',
-  [WF.PUBLISHED]:         'dark',
-  [WF.ARCHIVED]:          'light',
-}
-
-const STATUS_LABEL: Record<WorkflowStatus, string> = {
-  [WF.DRAFT]:             'Draft',
-  [WF.PENDING_REVIEW]:    'Pending Review',
-  [WF.CHANGES_REQUESTED]: 'Changes Requested',
-  [WF.APPROVED]:          'Approved',
-  [WF.PUBLISHED]:         'Published',
-  [WF.ARCHIVED]:          'Archived',
-}
-
-const TRANSITION_LABEL: Partial<Record<string, string>> = {
-  [`${WF.DRAFT}→${WF.PENDING_REVIEW}`]:             'Submit for Review',
-  [`${WF.PENDING_REVIEW}→${WF.APPROVED}`]:          'Approve',
-  [`${WF.PENDING_REVIEW}→${WF.CHANGES_REQUESTED}`]: 'Request Changes',
-  [`${WF.CHANGES_REQUESTED}→${WF.PENDING_REVIEW}`]: 'Resubmit',
-  [`${WF.CHANGES_REQUESTED}→${WF.APPROVED}`]:       'Approve Directly',
-  [`${WF.APPROVED}→${WF.PUBLISHED}`]:               'Publish',
-  [`${WF.APPROVED}→${WF.PENDING_REVIEW}`]:          'Return to Review',
-  [`${WF.PUBLISHED}→${WF.ARCHIVED}`]:               'Archive',
-  [`${WF.ARCHIVED}→${WF.DRAFT}`]:                   'Reset to Draft',
-}
-
-function buttonStyle(to: WorkflowStatus): ButtonStyleType {
-  if (to === WF.PUBLISHED) return 'primary'
-  if (to === WF.CHANGES_REQUESTED) return 'error'
+function variantFor(to: WorkflowStatus): ButtonVariant {
+  if (to === WF.PUBLISHED || to === WF.APPROVED) return 'primary'
+  if (to === WF.CHANGES_REQUESTED) return 'danger'
   return 'secondary'
 }
 
-export const ApprovalStatusField: React.FC<{ path?: string; readOnly?: boolean; [key: string]: unknown }> = ({
-  path = 'approvalStatus',
-  readOnly,
-}) => {
+export const ApprovalStatusField: React.FC<{
+  path?: string
+  readOnly?: boolean
+  [key: string]: unknown
+}> = ({ path = 'approvalStatus', readOnly }) => {
   const { value, setValue } = useField<WorkflowStatus>({ path })
   const { user } = useAuth()
 
-  const currentStatus = (value ?? WF.DRAFT) as WorkflowStatus
+  const current = (value ?? WF.DRAFT) as WorkflowStatus
+  const currentIndex = pipelineIndex(current)
+  const isChanges = current === WF.CHANGES_REQUESTED
+
   const userRoles = ((user as Record<string, unknown>)?.roles ?? []) as Role[]
 
   const validTransitions = readOnly
     ? []
     : TRANSITIONS.filter(
         ([from, , allowedRoles]) =>
-          from === currentStatus && allowedRoles.some((r) => userRoles.includes(r)),
+          from === current && allowedRoles.some((r) => userRoles.includes(r)),
       )
 
   return (
-    <div style={{ marginBottom: 'var(--base)' }}>
-      <label className="field-label">Approval Status</label>
-      <div style={{ marginTop: 'calc(var(--base) * 0.25)', marginBottom: validTransitions.length > 0 ? 'calc(var(--base) * 0.5)' : 0 }}>
-        <Pill pillStyle={STATUS_PILL[currentStatus] ?? 'light-gray'} size="small" rounded>
-          {STATUS_LABEL[currentStatus]}
-        </Pill>
+    <div className="approval">
+      <span className="approval__label">Approval</span>
+
+      <span className={`wf-pill ${STATUS_PILL_CLASS[current]}`}>
+        <span className="wf-pill__dot" />
+        {STATUS_LABEL[current]}
+      </span>
+
+      <div className="approval__stepper" role="list">
+        {PIPELINE.map((stage, i) => {
+          const state = i < currentIndex ? 'done' : i === currentIndex ? 'current' : 'upcoming'
+          const isCurrent = state === 'current'
+          const alert = isCurrent && isChanges
+          const name = isCurrent ? STATUS_LABEL[current] : STATUS_LABEL[stage]
+          const sub = isCurrent ? STAGE_SUB[current] : STAGE_SUB[stage]
+
+          return (
+            <div
+              key={stage}
+              role="listitem"
+              className={`approval__step approval__step--${state}${alert ? ' approval__step--alert' : ''}`}
+            >
+              <div className="approval__rail">
+                <span className="approval__node" />
+                {i < PIPELINE.length - 1 && <span className="approval__line" />}
+              </div>
+              <div>
+                <div className="approval__name">{name}</div>
+                <div className="approval__sub">{sub}</div>
+              </div>
+            </div>
+          )
+        })}
       </div>
 
       {validTransitions.length > 0 && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'calc(var(--base) * 0.3)' }}>
-          {validTransitions.map(([, to]) => {
-            const key = `${currentStatus}→${to}`
-            return (
-              <Button
-                key={to}
-                buttonStyle={buttonStyle(to)}
-                size="small"
-                type="button"
-                onClick={() => setValue(to)}
-              >
-                {TRANSITION_LABEL[key] ?? STATUS_LABEL[to]}
-              </Button>
-            )
-          })}
-          <p style={{ fontSize: '0.75rem', color: 'var(--theme-elevation-500)', margin: 0 }}>
-            Click an action then Save to apply.
-          </p>
+        <div className="approval__actions">
+          {validTransitions.map(([, to]) => (
+            <button
+              key={to}
+              type="button"
+              className={`approval__btn approval__btn--${variantFor(to)}`}
+              onClick={() => setValue(to)}
+            >
+              {TRANSITION_LABEL[`${current}→${to}`] ?? STATUS_LABEL[to]}
+            </button>
+          ))}
+          <p className="approval__hint">Choose an action, then Save to apply it.</p>
         </div>
       )}
 
       {validTransitions.length === 0 && !readOnly && (
-        <p style={{ fontSize: '0.75rem', color: 'var(--theme-elevation-500)', margin: 0 }}>
-          No transitions available at this stage.
-        </p>
+        <p className="approval__hint">No actions available to your role at this stage.</p>
       )}
     </div>
   )

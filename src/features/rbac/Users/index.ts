@@ -46,7 +46,10 @@ export const Users: CollectionConfig = {
       },
       admin: {
         position: 'sidebar',
-        description: 'Roles control what this user can do in the admin panel.',
+        description:
+          'What this person can do. Super Admin / Admin: manage people and all content. ' +
+          'Editor: review and publish. Author: write and submit their own posts. ' +
+          'Reviewer: approve or send back — no publishing. Viewer: read only.',
       },
     },
   ],

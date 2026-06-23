@@ -1,0 +1,31 @@
+// Shared workflow status pill — used in the edit view, list cells and the
+// dashboard widget so every surface speaks the same colour vocabulary.
+// Colours come from the `--wf-*` variables defined once in
+// src/app/(payload)/custom.scss ($wf-status map) — edit them there.
+
+.wf-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 11px 4px 9px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.4;
+  width: fit-content;
+  white-space: nowrap;
+
+  &__dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex: none;
+  }
+
+  &--draft     { background: var(--wf-draft-bg);     color: var(--wf-draft-tx);     .wf-pill__dot { background: var(--wf-draft-dot); } }
+  &--pending   { background: var(--wf-pending-bg);   color: var(--wf-pending-tx);   .wf-pill__dot { background: var(--wf-pending-dot); } }
+  &--changes   { background: var(--wf-changes-bg);   color: var(--wf-changes-tx);   .wf-pill__dot { background: var(--wf-changes-dot); } }
+  &--approved  { background: var(--wf-approved-bg);  color: var(--wf-approved-tx);  .wf-pill__dot { background: var(--wf-approved-dot); } }
+  &--published { background: var(--wf-published-bg); color: var(--wf-published-tx); .wf-pill__dot { background: var(--wf-published-dot); } }
+  &--archived  { background: var(--wf-archived-bg);  color: var(--wf-archived-tx);  .wf-pill__dot { background: var(--wf-archived-dot); } }
+}

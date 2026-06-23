@@ -1,24 +1,27 @@
-@import '@payloadcms/ui/scss';
+.before-dashboard {
+  margin-bottom: calc(var(--base) * 1.25);
 
-.dashboard .before-dashboard {
-  margin-bottom: base(1.5);
-
-  &__banner {
-    & h4 {
-      margin: 0;
-    }
+  &__welcome {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.012em;
+    margin: 0 0 calc(var(--base) * 0.2);
+    color: var(--theme-text);
   }
 
-  &__instructions {
-    list-style: decimal;
-    margin-bottom: base(0.5);
-
-    & li {
-      width: 100%;
-    }
+  &__lede {
+    margin: 0 0 calc(var(--base) * 0.9);
+    color: var(--theme-elevation-500);
+    font-size: 14.5px;
+    max-width: 46ch;
   }
 
-  & a:hover {
-    opacity: 0.85;
+  &__seed {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--base) * 0.5);
+    flex-wrap: wrap;
+    font-size: 13.5px;
+    color: var(--theme-elevation-500);
   }
 }
